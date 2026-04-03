@@ -22,8 +22,7 @@ REST API (NestJS hoặc Express)
     │
     ├── AuthModule        → login, JWT issue/verify
     ├── UsersModule       → CRUD user (admin, seller, buyer)
-    ├── HousesModule      → quản lý house, meter
-    ├── PricesModule      → quản lý price
+    ├── HousesModule      → quản lý house, meter    ├── GroupsModule        → quản lý group (nhóm house có chung price/formula)    ├── PricesModule      → quản lý price
     ├── FormulasModule    → quản lý formula
     ├── UsagesModule      → electricity/water usage
     ├── BillsModule       → tạo và xuất bill
@@ -124,11 +123,25 @@ updated_at      TIMESTAMP
 
 > `admin` accounts được tạo bởi developer qua seed script. `created_by` lưu developer id khi applicable.
 
-### 5.2 house
+### 5.2 group
 
 ```
 id          UUID, PK
 seller_id   UUID, FK → users.id (role=seller)
+name        VARCHAR, NOT NULL
+type        INT, NOT NULL  -- 1=house_group | 2=user_group (future)
+created_at  TIMESTAMP
+updated_at  TIMESTAMP
+```
+
+> `type` phân biệt mục đích của group. Hiện tại chỉ `type=1` (house group) được hỗ trợ; `type=2` (user group) dành cho mở rộng sau. API `/api/groups` được thiết kế để tái sử dụng cho cả hai loại mà không cần endpoint riêng.
+
+### 5.3 house
+
+```
+id          UUID, PK
+seller_id   UUID, FK → users.id (role=seller)
+group_id    UUID, FK → group.id, nullable
 name        VARCHAR
 address     VARCHAR
 unit        VARCHAR (số phòng / tên phòng)
@@ -140,7 +153,9 @@ created_at  TIMESTAMP
 updated_at  TIMESTAMP
 ```
 
-### 5.3 tenancy (lịch sử thuê phòng)
+> Nếu `group_id` được gán, house kế thừa price và formula của group. Nếu `group_id` là null, house dùng price/formula được gán trực tiếp.
+
+### 5.4 tenancy (lịch sử thuê phòng)
 
 ```
 id          UUID, PK
@@ -153,7 +168,7 @@ role        VARCHAR
 
 > Dùng bảng này thay vì `active_house_id` đơn giản để theo dõi lịch sử.
 
-### 5.4 meter
+### 5.5 meter
 
 ```
 id                 UUID, PK
@@ -164,7 +179,7 @@ installed_at       TIMESTAMP
 metadata           JSONB
 ```
 
-### 5.5 price
+### 5.6 price
 
 ```
 id           UUID, PK
@@ -181,7 +196,7 @@ created_at   TIMESTAMP
 updated_at   TIMESTAMP
 ```
 
-### 5.6 formula
+### 5.7 formula
 
 ```
 id          UUID, PK
@@ -196,7 +211,23 @@ updated_at  TIMESTAMP
 
 > Formula định nghĩa cách tính bill từ usage và price. Có thể là biểu thức toán học hoặc cấu trúc JSON rules.
 
-### 5.7 house_price / house_formula (assignment tables)
+### 5.8 group_price / group_formula (assignment tables)
+
+```
+-- group_price
+group_id     UUID, FK → group.id
+price_id     UUID, FK → price.id
+assigned_at  TIMESTAMP
+
+-- group_formula
+group_id     UUID, FK → group.id
+formula_id   UUID, FK → formula.id
+assigned_at  TIMESTAMP
+```
+
+> Price và formula được gán vào `group`. Tất cả house trong group kế thừa cấu hình này.
+
+### 5.9 house_price / house_formula (assignment tables — per-house override)
 
 ```
 house_id     UUID, FK → house.id
@@ -205,9 +236,9 @@ price_id     UUID, FK → price.id
 assigned_at  TIMESTAMP
 ```
 
-> Many-to-many: 1 house có thể gán nhiều price (electric, water, house) và 1 formula.
+> Dùng khi house không thuộc group nào, hoặc cần override giá riêng. Khi house thuộc group, cấu hình của group ưu tiên hơn.
 
-### 5.8 usage (electricity_usage / water_usage)
+### 5.10 usage (electricity_usage / water_usage)
 
 ```
 id                  UUID, PK
@@ -227,7 +258,7 @@ created_at          TIMESTAMP
 updated_at          TIMESTAMP
 ```
 
-### 5.9 bill
+### 5.11 bill
 
 ```
 id              UUID, PK
@@ -248,7 +279,7 @@ updated_at      TIMESTAMP
 
 > **Ràng buộc quan trọng:** `UNIQUE(house_id, billing_cycle)` — mỗi house chỉ có tối đa 1 bill mỗi kỳ.
 
-### 5.10 payment
+### 5.12 payment
 
 ```
 id              UUID, PK
@@ -263,7 +294,7 @@ paid_at         TIMESTAMP, nullable
 created_at      TIMESTAMP
 ```
 
-### 5.11 audit_log
+### 5.13 audit_log
 
 ```
 id          UUID, PK
@@ -303,13 +334,24 @@ admin đăng nhập
 
 ```
 seller đăng nhập
+  → Tạo group (tuỳ chọn): POST /api/groups { name }
   → Tạo house:   POST /api/houses
   → Tạo meter:   POST /api/houses/:id/meters  (electric, water)
   → Tạo price:   POST /api/prices  (electric price, water price, house price)
   → Tạo formula: POST /api/formulas
-  → Gán price và formula vào house:
+
+  --- Nếu dùng group ---
+  → Gán price và formula vào group:
+        POST /api/groups/:id/prices
+        POST /api/groups/:id/formula
+  → Thêm house vào group:
+        PATCH /api/houses/:id { group_id }
+
+  --- Nếu không dùng group (cấu hình riêng từng phòng) ---
+  → Gán price và formula trực tiếp vào house:
         POST /api/houses/:id/prices
         POST /api/houses/:id/formula
+
   → Tạo buyer:   POST /api/users { role: 3 }
   → Gán buyer vào house (tạo tenancy):
         POST /api/houses/:id/tenants
@@ -410,18 +452,29 @@ buyer thanh toán (in-app hoặc ngoài app)
 | GET    | `/api/users/:id` | ✓    | Xem thông tin user                   |
 | PATCH  | `/api/users/:id` | ✓    | Cập nhật thông tin user              |
 
-### Houses
+### Groups
 
 | Method | Path                      | Auth | Actor        |
 | ------ | ------------------------- | ---- | ------------ |
-| POST   | `/api/houses`             | ✓    | seller/admin |
-| GET    | `/api/houses`             | ✓    | seller (own) |
-| GET    | `/api/houses/:id`         | ✓    | seller/buyer |
-| PATCH  | `/api/houses/:id`         | ✓    | seller/admin |
-| POST   | `/api/houses/:id/meters`  | ✓    | seller       |
-| POST   | `/api/houses/:id/prices`  | ✓    | seller       |
-| POST   | `/api/houses/:id/formula` | ✓    | seller       |
-| POST   | `/api/houses/:id/tenants` | ✓    | seller       |
+| POST   | `/api/groups`             | ✓    | seller/admin |
+| GET    | `/api/groups`             | ✓    | seller (own) |
+| GET    | `/api/groups/:id`         | ✓    | seller/admin |
+| PATCH  | `/api/groups/:id`         | ✓    | seller/admin |
+| POST   | `/api/groups/:id/prices`  | ✓    | seller       |
+| POST   | `/api/groups/:id/formula` | ✓    | seller       |
+
+### Houses
+
+| Method | Path                      | Auth | Actor                                  |
+| ------ | ------------------------- | ---- | -------------------------------------- |
+| POST   | `/api/houses`             | ✓    | seller/admin                           |
+| GET    | `/api/houses`             | ✓    | seller (own)                           |
+| GET    | `/api/houses/:id`         | ✓    | seller/buyer                           |
+| PATCH  | `/api/houses/:id`         | ✓    | seller/admin                           |
+| POST   | `/api/houses/:id/meters`  | ✓    | seller                                 |
+| POST   | `/api/houses/:id/prices`  | ✓    | seller (override khi không dùng group) |
+| POST   | `/api/houses/:id/formula` | ✓    | seller (override khi không dùng group) |
+| POST   | `/api/houses/:id/tenants` | ✓    | seller                                 |
 
 ### Prices & Formulas
 
@@ -482,8 +535,10 @@ buyer thanh toán (in-app hoặc ngoài app)
 6. **Audit log bắt buộc** cho: login success/failed, approve/discard usage, tạo/xuất bill, tạo user.
 7. **Seller chỉ thấy data của mình** — house, price, formula, usage, bill đều scoped theo `seller_id`.
 8. **Buyer chỉ thấy data liên quan** — chỉ xem bill và usage của house mình đang thuê.
-9. **Formula + Price phải được gán vào house** trước khi xuất bill — nếu thiếu thì trả lỗi rõ ràng.
+9. **Formula + Price phải được gán** (qua group hoặc trực tiếp) trước khi xuất bill — nếu thiếu thì trả lỗi rõ ràng.
 10. **Seed script idempotent** — chạy nhiều lần không tạo trùng admin.
+11. **Một house chỉ thuộc tối đa 1 group** — `group_id` là nullable FK, không phải mảng.
+12. **Price/formula của group ưu tiên hơn per-house assignment** — khi house thuộc group, billing engine dùng config của group.
 
 ---
 
@@ -532,12 +587,16 @@ pnpm dev
 developer ──provisions──▶ admin(1)
 admin(1) ─────creates────▶ seller(N)
 seller(1) ────creates────▶ buyer(N)
+seller(1) ────creates────▶ group(N)
 seller(1) ────manages────▶ house(N)
-house(1) ─────has────────▶ meter(N)
+group(1) ────contains───▶ house(N)  [house.group_id]
+house(1) ─────has──────▶ meter(N)
 seller(1) ────creates────▶ price(N)
 seller(1) ────creates────▶ formula(N)
-house ◀──assigned──────── price (N:M via house_price)
-house ◀──assigned──────── formula (N:M via house_formula)
+group ◄─assigned─────── price (N:M via group_price)   ← ưu tiên hơn
+group ◄─assigned─────── formula (N:M via group_formula)
+house ◄─assigned─────── price (N:M via house_price)    ← override khi không dùng group
+house ◄─assigned─────── formula (N:M via house_formula)
 buyer(N) ────tenancy────▶ house(N)  [via tenancy table]
 meter(1) ─────has────────▶ usage(N)
 usage(N) ────(approved)──▶ bill(1) line_items  [per billing_cycle]

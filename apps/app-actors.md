@@ -18,10 +18,16 @@ buyer:
 - Mối quan hệ: 1 buyer có thể thuê N house (historical); 1 buyer tạo N usage; 1 buyer có N payment
 - Ghi chú: có thể để `active_house_id` để biểu thị house đang thuê hiện tại
 
+group:
+
+- Trường: id, seller_id, name, type (1=house_group, 2=user_group), created_at, updated_at
+- Mối quan hệ: 1 seller có N group; 1 group (type=1) chứa N house; 1 group có thể gán N price; 1 group có thể gán 1 formula
+- Ghi chú: `type` cho phép tái sử dụng API group cho nhiều mục đích; hiện tại chỉ `type=1` được hỗ trợ. `price` và `formula` gán vào `group` được kế thừa bởi tất cả `house` trong group đó
+
 house:
 
-- Trường: id, seller_id, name, address, unit (phòng/số), area, status (active/vacant/maintenance), deposit, metadata, created_at
-- Mối quan hệ: 1 house thuộc 1 seller; 1 house có N meter; 1 house có N bill (mỗi billing_cycle tối đa 1 bill); 1 house có N historical tenants (buyer)
+- Trường: id, seller_id, group_id (tuỳ, FK → group), name, address, unit (phòng/số), area, status (active/vacant/maintenance), deposit, metadata, created_at
+- Mối quan hệ: 1 house thuộc 1 seller; 1 house thuộc tối đa 1 group; 1 house có N meter; 1 house có N bill (mỗi billing_cycle tối đa 1 bill); 1 house có N historical tenants (buyer)
 
 meter:
 

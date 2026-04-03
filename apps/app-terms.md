@@ -6,6 +6,8 @@ seller: Chủ nhà trọ (người đăng/quản lý `house` và tạo `price` /
 
 buyer: Người thuê trọ (tenant) — người nhận `bill`, gửi `electricity usage` / `water usage`.
 
+group: Nhóm do `seller` tạo, phân biệt bằng `type`. `type=1` là nhóm house (house group): gom các phòng có chung `price` và `formula`; mỗi `house` chỉ thuộc tối đa 1 group loại này. `type=2` (tương lai) là nhóm user. Khi `house` thuộc `group`, nó kế thừa `price` và `formula` của `group` thay vì cấu hình riêng từng phòng.
+
 house: Đơn vị cho thuê (phòng/nhà) mà `seller` tạo và quản lý.
 
 price: Bảng giá (ví dụ: `electric price`, `water price`, `house price`) — chứa đơn vị, giá trên đơn vị, và metadata về effective period.
