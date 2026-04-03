@@ -59,8 +59,8 @@ Database (PostgreSQL)
 ### 4.1 Cơ chế
 
 - Dùng **JWT** (JSON Web Token).
-- Endpoint login: `POST /api/auth/login` với `email` + `password`.
-- Thành công trả về `accessToken` (JWT) và thông tin user cơ bản (`id`, `email`, `role`).
+- Endpoint login: `POST /api/auth/login` với `username` + `password`.
+- Thành công trả về `accessToken` (JWT) và thông tin user cơ bản (`id`, `username`, `role`).
 - Token có thời hạn mặc định **15 phút**, cấu hình qua `JWT_ACCESS_TOKEN_EXPIRATION`.
 - Secret cấu hình qua `JWT_SECRET`.
 
@@ -70,8 +70,8 @@ Database (PostgreSQL)
 Client                          Server
   │                               │
   │── POST /api/auth/login ──────▶│
-  │   { email, password }         │
-  │                               │── Tìm user theo email trong DB
+  │   { username, password }      │
+  │                               │── Tìm user theo username trong DB
   │                               │── So sánh password với bcrypt hash
   │                               │── Nếu khớp: tạo JWT, ghi audit_log(login_success)
   │                               │── Nếu không khớp: ghi audit_log(login_failed)
@@ -82,9 +82,9 @@ Client                          Server
 
 ### 4.3 Quy tắc bảo mật
 
-- **Không phân biệt** "email không tồn tại" và "sai password" trong response — luôn trả về `401` với cùng một thông báo chung (tránh enumeration attack).
+- **Không phân biệt** "username không tồn tại" và "sai password" trong response — luôn trả về `401` với cùng một thông báo chung (tránh enumeration attack).
 - Password được hash bằng **bcrypt** trước khi lưu, không bao giờ trả về raw password.
-- Thiếu field (`email` hoặc `password`) trả về `400`.
+- Thiếu field (`username` hoặc `password`) trả về `400`.
 
 ### 4.4 Các endpoint auth liên quan
 

@@ -2,19 +2,19 @@
 
 admin:
 
-- Trường: id, email, full_name (tuỳ), phone (tuỳ), created_at
+- Trường: id, username, full_name (tuỳ), phone (tuỳ), created_at
 - Mối quan hệ: 1 admin quản lý N seller
 
-Note: `admin` accounts are provisioned by developer (developer will create/administer initial admin accounts). Record provenance with `created_by` (developer id) and `provisioned_at` when applicable.
+Note: `admin` accounts are provisioned by developer — developer manually creates the initial admin account using a username and password provided by the admin. Record provenance with `created_by` (developer id) and `provisioned_at` when applicable.
 
 seller:
 
-- Trường: id, email, full_name, phone, address (tuỳ), verification_status, created_at
+- Trường: id, username, email, full_name, phone, address (tuỳ), verification_status, created_at
 - Mối quan hệ: 1 seller quản lý N house; 1 seller tạo N price; 1 seller tạo N formula; 1 seller có thể tạo/approve N usage và issue N bill
 
 buyer:
 
-- Trường: id, email, full_name, phone, identification (tuỳ), created_at
+- Trường: id, username, email (tuỳ), full_name, phone, identification (tuỳ), created_at
 - Mối quan hệ: 1 buyer có thể thuê N house (historical); 1 buyer tạo N usage; 1 buyer có N payment
 - Ghi chú: có thể để `active_house_id` để biểu thị house đang thuê hiện tại
 

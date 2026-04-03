@@ -38,7 +38,7 @@ audit log: Lịch sử các thao tác quan trọng (ai approve/discard/export/mo
 
 notification: Cơ chế thông báo (in-app/email/SMS) gửi tới `buyer` hoặc `seller` về sự kiện hệ thống.
 
-authentication / login: Quá trình xác thực người dùng để cho phép truy cập vào ứng dụng. Thông thường dựa trên `email` + `password` hoặc provider OAuth; cần lưu `password_hash`, `auth_provider`, `last_login`, `is_active` trong hồ sơ người dùng.
+authentication / login: Quá trình xác thực người dùng để cho phép truy cập vào ứng dụng. Dựa trên `username` + `password`; cần lưu `password_hash`, `last_login`, `is_active` trong hồ sơ người dùng.
 
 developer: Người phát triển / vận hành hệ thống (ops). Developer chịu trách nhiệm provision tài khoản `admin` ban đầu và có thể thực hiện tác vụ quản trị hệ thống ngoài ứng dụng (khôi phục, reset admin, v.v.).
 
