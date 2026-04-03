@@ -10,7 +10,7 @@ group: Nhóm do `seller` tạo, phân biệt bằng `type`. `type=1` là nhóm h
 
 house: Đơn vị cho thuê (phòng/nhà) mà `seller` tạo và quản lý.
 
-price: Bảng giá (ví dụ: `electric price`, `water price`, `house price`) — chứa đơn vị, giá trên đơn vị, và metadata về effective period.
+bảng giá (price): Mục giá do `seller` tạo, gồm `name` (tên bảng giá, ví dụ: "tiền điện") và `unit_price` (giá trên một đơn vị, đơn vị tiền mặc định là VND). `name` là nhãn hiển thị đồng thời là nhận diện duy nhất — seller tự đặt tên gợi nhớ. Nhiều `house` hoặc `group` có thể dùng chung một bảng giá. Trong code và API, entity này được gọi là `price`; trong giao diện người dùng gọi là **bảng giá**.
 
 formula: Công thức/luật để tính `bill` từ các `usage` và `price` (có thể là biểu thức hoặc rules engine).
 

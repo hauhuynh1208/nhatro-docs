@@ -179,22 +179,19 @@ installed_at       TIMESTAMP
 metadata           JSONB
 ```
 
-### 5.6 price
+### 5.6 price (bảng giá)
 
 ```
-id           UUID, PK
-seller_id    UUID, FK → users.id
-name         VARCHAR
-price_type   ENUM('electric', 'water', 'house')
-unit         VARCHAR (kWh / m3 / month)
-unit_price   DECIMAL
-currency     VARCHAR, DEFAULT 'VND'
-effective_from  DATE
-effective_to    DATE, nullable
-metadata     JSONB
-created_at   TIMESTAMP
-updated_at   TIMESTAMP
+id          UUID, PK
+seller_id   UUID, FK → users.id (role=seller), NOT NULL
+name        VARCHAR, NOT NULL    -- tên bảng giá do seller tự đặt, ví dụ: "tien dien"
+unit_price  DECIMAL(15,4), NOT NULL  -- must be > 0
+metadata    JSONB
+created_at  TIMESTAMP
+updated_at  TIMESTAMP
 ```
+
+> Field cốt lõi: `name` (tên bảng giá) và `unit_price` (giá trị). Không có `price_type` — `name` là nhận diện duy nhất. `seller_id` được server gán tự động từ JWT.
 
 ### 5.7 formula
 
@@ -476,14 +473,16 @@ buyer thanh toán (in-app hoặc ngoài app)
 | POST   | `/api/houses/:id/formula` | ✓    | seller (override khi không dùng group) |
 | POST   | `/api/houses/:id/tenants` | ✓    | seller                                 |
 
-### Prices & Formulas
+### Bảng giá (Prices) & Formulas
 
-| Method | Path            | Auth | Actor        |
-| ------ | --------------- | ---- | ------------ |
-| POST   | `/api/prices`   | ✓    | seller/admin |
-| GET    | `/api/prices`   | ✓    | seller (own) |
-| POST   | `/api/formulas` | ✓    | seller/admin |
-| GET    | `/api/formulas` | ✓    | seller (own) |
+| Method | Path              | Auth | Actor        | Ghi chú                                  |
+| ------ | ----------------- | ---- | ------------ | ---------------------------------------- |
+| POST   | `/api/prices`     | ✓    | seller/admin | Tạo bảng giá; `seller_id` tự động từ JWT |
+| GET    | `/api/prices`     | ✓    | seller (own) | Chỉ trả bảng giá của seller đang gọi     |
+| GET    | `/api/prices/:id` | ✓    | seller/admin | Xem chi tiết 1 bảng giá                  |
+| PATCH  | `/api/prices/:id` | ✓    | seller/admin | Cập nhật bảng giá                        |
+| POST   | `/api/formulas`   | ✓    | seller/admin |                                          |
+| GET    | `/api/formulas`   | ✓    | seller (own) |                                          |
 
 ### Usages
 

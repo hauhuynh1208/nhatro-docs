@@ -1,9 +1,9 @@
-Title: Seller creates house group
+Title: Seller creates a price
 ID: US-5
 Actor: seller
 As a: seller
-I want: create a group by providing a name, so that I can later assign multiple houses, prices, and a formula to that group
-So that: all houses belonging to the same group share the same electricity/water prices and billing formula, reducing repetitive configuration
+I want: create a price by providing a name and a unit price
+So that: I can later assign the price to a house or a group so it is used when calculating the monthly bill
 
 Preconditions:
 
@@ -12,56 +12,68 @@ Preconditions:
 
 Trigger:
 
-- Seller sends `POST /api/groups` with `Authorization: Bearer {sellerToken}` and body `{ name, type: 1 }`
+- Seller sends `POST /api/prices` with `Authorization: Bearer {sellerToken}` and request body
+
+Required fields:
+
+| Field        | Type    | Description                                       | Example     |
+| ------------ | ------- | ------------------------------------------------- | ----------- |
+| `name`       | string  | Display name for the price (chosen by the seller) | "tien dien" |
+| `unit_price` | decimal | Price per unit; default currency is VND           | 2500        |
 
 Acceptance Criteria (AC):
 
-1. Request body is validated — `name` is required and must be a non-empty string; `type` is required and must be a valid integer (currently only `1` is accepted); missing or invalid fields return HTTP 400.
-2. On success, a group record is created with `seller_id = caller.id` and `type = 1`; HTTP 201 is returned with `{ id, name, type, seller_id, createdAt }`.
-3. Requests without a valid JWT return HTTP 401.
-4. A `buyer` or any role other than `seller` / `admin` calling this endpoint returns HTTP 403.
-5. `GET /api/groups` returns only groups belonging to the calling seller (`seller_id = caller.id`) — groups created by other sellers are not visible.
-6. Two groups belonging to the same seller can have the same name (no uniqueness constraint on name per seller). _(Names are for display only; identity is by `id`.)_
-7. A newly created group has no houses, prices, or formula assigned yet — those are separate operations.
+1. `name` and `unit_price` are required; missing or invalid fields return HTTP 400.
+2. `unit_price` must be a positive number; values ≤ 0 return HTTP 400.
+3. On success, a price record is created with `seller_id = caller.id`; HTTP 201 is returned with `{ id, name, unit_price, seller_id, createdAt }`.
+4. Requests without a valid JWT return HTTP 401.
+5. A `buyer` calling this endpoint returns HTTP 403.
+6. `GET /api/prices` returns only prices belonging to the calling seller (`seller_id = caller.id`) — prices created by other sellers are not visible.
+7. Two prices belonging to the same seller may share the same name (no uniqueness constraint on name).
+8. A newly created price has no house or group assignment yet — those are separate operations.
 
 Steps for AI agent (ordered):
 
-1. POST `/api/auth/login` with seller credentials — capture `sellerToken`.
-2. POST `/api/groups` with `Authorization: Bearer {sellerToken}` and body `{"name":"Dãy trọ A","type":1}` — expect 201 and `{ id, name, type, seller_id, createdAt }`.
-3. GET `/api/groups` with `Authorization: Bearer {sellerToken}` — expect 200 and list containing the newly created group.
-4. POST `/api/auth/login` with a different seller's credentials — capture `sellerBToken`.
-5. GET `/api/groups` with `Authorization: Bearer {sellerBToken}` — expect 200 and list NOT containing the group from step 2.
-6. POST `/api/groups` with `Authorization: Bearer {sellerToken}` and body `{}` (missing name) — expect 400.
-7. POST `/api/groups` without Authorization header — expect 401.
-8. Return structured result: `{"status":"ok|failed","evidence":{...}}`
+1. POST `/api/auth/login` with seller A credentials — capture `sellerToken`.
+2. POST `/api/prices` with `Authorization: Bearer {sellerToken}` and body `{"name":"tien dien","unit_price":2500}` — expect 201 and `{ id, name, unit_price, seller_id, createdAt }`.
+3. GET `/api/prices` with `Authorization: Bearer {sellerToken}` — expect 200 and list containing the newly created price.
+4. POST `/api/auth/login` with seller B credentials — capture `sellerBToken`.
+5. GET `/api/prices` with `Authorization: Bearer {sellerBToken}` — expect 200 and list NOT containing seller A's price.
+6. POST `/api/prices` with `unit_price: -100` — expect 400.
+7. POST `/api/prices` with missing `name` — expect 400.
+8. POST `/api/prices` with missing `unit_price` — expect 400.
+9. POST `/api/prices` without Authorization header — expect 401.
+10. Return structured result: `{"status":"ok|failed","evidence":{...}}`
 
 Machine-readable JSON:
 
 ```json
 {
   "id": "US-5",
-  "title": "Seller creates house group",
+  "title": "Seller creates a price",
   "actor": "seller",
   "as_a": "seller",
-  "i_want": "create a named group to organize houses with shared prices and formula",
-  "so_that": "houses in the same group share electricity/water prices and billing formula",
+  "i_want": "create a price with a name and unit price",
+  "so_that": "I can assign it to a house or group for monthly bill calculation",
   "preconditions": [
     "seller is authenticated with valid JWT",
     "application is running"
   ],
-  "trigger": "POST /api/groups",
+  "trigger": "POST /api/prices",
   "acceptance_criteria": [
-    "400 on missing or empty name, or missing/invalid type",
-    "201 with { id, name, type, seller_id, createdAt } on success",
-    "type=1 means house group; future type=2 will be user group",
+    "400 on missing or empty name",
+    "400 on missing unit_price",
+    "400 if unit_price <= 0",
+    "201 with { id, name, unit_price, seller_id, createdAt } on success",
+    "seller_id set automatically from JWT",
     "401 without valid JWT",
-    "403 for non-seller/admin roles",
-    "GET /api/groups scoped to calling seller — other sellers' groups not visible",
-    "newly created group has no houses/prices/formula assigned yet"
+    "403 for buyer role",
+    "GET /api/prices scoped to calling seller",
+    "newly created price has no house or group assignment yet"
   ],
   "steps": [
     {
-      "action": "seller login",
+      "action": "seller A login",
       "api": {
         "method": "POST",
         "path": "/api/auth/login",
@@ -70,23 +82,23 @@ Machine-readable JSON:
       "expect": "200 and accessToken"
     },
     {
-      "action": "create group",
+      "action": "create price",
       "api": {
         "method": "POST",
-        "path": "/api/groups",
+        "path": "/api/prices",
         "headers": { "Authorization": "Bearer {sellerToken}" },
-        "body": { "name": "Dãy trọ A", "type": 1 }
+        "body": { "name": "tien dien", "unit_price": 2500 }
       },
-      "expect": "201 and { id, name, type, seller_id, createdAt }"
+      "expect": "201 and { id, name, unit_price, seller_id, createdAt }"
     },
     {
-      "action": "list seller's groups",
+      "action": "list seller A's prices",
       "api": {
         "method": "GET",
-        "path": "/api/groups",
+        "path": "/api/prices",
         "headers": { "Authorization": "Bearer {sellerToken}" }
       },
-      "expect": "200 and list containing created group"
+      "expect": "200 and list containing created price"
     },
     {
       "action": "seller B login",
@@ -98,21 +110,41 @@ Machine-readable JSON:
       "expect": "200 and accessToken"
     },
     {
-      "action": "seller B lists groups — must NOT see seller A's group",
+      "action": "seller B lists prices — must NOT see seller A's price",
       "api": {
         "method": "GET",
-        "path": "/api/groups",
+        "path": "/api/prices",
         "headers": { "Authorization": "Bearer {sellerBToken}" }
       },
-      "expect": "200 and list NOT containing seller A's group"
+      "expect": "200 and list NOT containing seller A's price"
     },
     {
-      "action": "missing name validation",
+      "action": "invalid unit_price (negative)",
       "api": {
         "method": "POST",
-        "path": "/api/groups",
+        "path": "/api/prices",
         "headers": { "Authorization": "Bearer {sellerToken}" },
-        "body": {}
+        "body": { "name": "test", "unit_price": -100 }
+      },
+      "expect": "400"
+    },
+    {
+      "action": "missing name",
+      "api": {
+        "method": "POST",
+        "path": "/api/prices",
+        "headers": { "Authorization": "Bearer {sellerToken}" },
+        "body": { "unit_price": 2500 }
+      },
+      "expect": "400"
+    },
+    {
+      "action": "missing unit_price",
+      "api": {
+        "method": "POST",
+        "path": "/api/prices",
+        "headers": { "Authorization": "Bearer {sellerToken}" },
+        "body": { "name": "tien dien" }
       },
       "expect": "400"
     },
@@ -120,18 +152,18 @@ Machine-readable JSON:
       "action": "unauthenticated request",
       "api": {
         "method": "POST",
-        "path": "/api/groups",
-        "body": { "name": "Test" }
+        "path": "/api/prices",
+        "body": { "name": "tien dien", "unit_price": 2500 }
       },
       "expect": "401"
     }
   ],
   "data": {
-    "group": {
+    "price": {
       "id": "uuid",
       "seller_id": "uuid",
       "name": "string",
-      "type": "int (1=house_group, 2=user_group)",
+      "unit_price": "decimal (> 0)",
       "createdAt": "timestamp",
       "updatedAt": "timestamp"
     }
@@ -144,28 +176,28 @@ Machine-readable JSON:
         "user": { "id": "seller-a-id", "role": 2 }
       }
     },
-    "POST /api/groups": {
+    "POST /api/prices": {
       "status": 201,
       "body": {
-        "id": "group-uuid",
-        "name": "Dãy trọ A",
-        "type": 1,
+        "id": "price-uuid",
+        "name": "tien dien",
+        "unit_price": 2500,
         "seller_id": "seller-a-id",
         "createdAt": "2026-04-03T00:00:00Z"
       }
     },
-    "GET /api/groups (sellerA)": {
+    "GET /api/prices (sellerA)": {
       "status": 200,
       "body": [
         {
-          "id": "group-uuid",
-          "name": "Dãy trọ A",
-          "type": 1,
+          "id": "price-uuid",
+          "name": "tien dien",
+          "unit_price": 2500,
           "seller_id": "seller-a-id"
         }
       ]
     },
-    "GET /api/groups (sellerB)": {
+    "GET /api/prices (sellerB)": {
       "status": 200,
       "body": []
     }
@@ -176,12 +208,8 @@ Machine-readable JSON:
 Notes:
 
 - `seller_id` is set automatically from the JWT — not provided in request body.
-- `type` distinguishes the group's purpose: `1` = house group (current), `2` = user group (future). Only `type=1` is accepted for now; the API is designed to be extended without breaking changes.
-- When `type` is missing or not a valid value, return HTTP 400.
-- `group` is a container for houses. After creation, separate operations are used to:
-  - Assign prices to the group: `POST /api/groups/:id/prices`
-  - Assign a formula to the group: `POST /api/groups/:id/formula`
-  - Add a house to the group: `PATCH /api/houses/:id` with `{ group_id }`
-- When a house belongs to a group, it inherits the group's prices and formula for billing. Direct per-house price/formula assignments are overridden by the group's configuration.
-- A house can only belong to one group at a time (`group_id` is a single nullable FK on `house`).
-- `GET /api/groups` is scoped to the calling seller; server infers the scope from the JWT — no extra query param needed.
+- The `name` field is the sole identifier for the price's purpose (e.g., "tien dien", "tien nuoc", "tien phong"). No classification type field is needed.
+- After creating a price, assign it to a house or group via separate endpoints:
+  - Assign to a group: `POST /api/groups/:id/prices`
+  - Assign directly to a house: `POST /api/houses/:id/prices`
+- `GET /api/prices` is scoped to the calling seller; the server infers the scope from the JWT — no extra query param needed.

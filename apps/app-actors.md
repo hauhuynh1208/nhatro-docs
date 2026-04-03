@@ -34,10 +34,11 @@ meter:
 - Trường: id, house_id, meter_type (electric/water), external_meter_id, installed_at, metadata
 - Mối quan hệ: 1 house có N meter; 1 meter có N usage
 
-price:
+price (bảng giá):
 
-- Trường: id, seller_id, name, price_type (electric/water/house), unit (kWh/m3/month), unit_price (decimal), currency, effective_from, effective_to, metadata
-- Mối quan hệ: 1 seller có N price; 1 price có thể gán vào N house
+- Trường: id, seller_id, name (tên bảng giá do seller tự đặt, ví dụ: "tiền điện"), unit_price (decimal, > 0), metadata, created_at
+- Mối quan hệ: 1 seller có N bảng giá; 1 bảng giá có thể gán vào N house hoặc N group
+- Ghi chú: `name` là nhận diện duy nhất của bảng giá — không có trường `price_type`
 
 formula:
 
