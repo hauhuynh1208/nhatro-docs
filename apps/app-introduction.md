@@ -19,21 +19,21 @@ Có 3 đối tượng sử dụng app này: `admin`, `seller`, `buyer` (xem `app
 
 ## seller
 
-- Tạo tài khoản buyer
-- Tạo phòng cho thuê (phòng cho thuê gọi là house)
-- Gán buyer vào phòng cho thuê
-- Tạo bảng giá (bảng giá gọi là price)
-- Gán bảng giá cho phòng cho thuê
-- Ghi số điện / nước
-- Approve số điện / nước được ghi từ buyer
-- Tạo bill
+- Tạo `formula` với biểu thức có `{{variable}}`
+- Tạo tài khoản `buyer` với chỉ số `baseline` (điện, nước, số người) và tháng khởi điểm
+- Gán `formula` cho `buyer`
+- Tạo `container` để thu thập chỉ số cuối kỳ
+- Gửi link container đến buyer
+- Duyệt (approve/discard) các `submission` từ buyer
+- Xuất bill cho buyer
 - Kiểm tra tình trạng thanh toán
 
 ## buyer
 
-- Nhận bill từ seller
-- Gửi thông tin điện / nước đến cho buyer
-- Đóng tiền phòng
+- Nhận link `container` từ seller
+- Submit chỉ số điện/nước vào container
+- Nhận và xem bill
+- Đóng tiền
 
 ## admin
 
