@@ -1,16 +1,16 @@
 ## Header
 
-Title: Admin views seller account list
+Title: Admin creates seller account
 ID: US-003
 Priority: Must
 Actor: admin
 As a: admin
-I want: view a list of all created seller accounts
-So that: I can monitor and manage sellers in the system
+I want: create a seller account by providing username, password, and optional profile information
+So that: the seller can log in and start managing their rental properties on the system
 
 ## Business Value
 
-The seller account list gives the admin an overview of all active sellers and serves as the entry point for further management tasks such as viewing details or editing a seller's profile.
+Seller account is a prerequisite for any seller to use the system. Without this feature, the admin cannot onboard sellers, which blocks the entire rental management flow — from creating houses to issuing bills.
 
 ## Preconditions
 
@@ -18,21 +18,23 @@ The seller account list gives the admin an overview of all active sellers and se
 
 ## Trigger
 
-- Admin selects "Sellers" from the side menu
+- Admin taps "Create Seller" on the seller accounts management screen
 
 ## Acceptance Criteria
 
-1. The list displays each seller with the following information: `full_name`, `phone`, `address`, `created_at`.
-2. On desktop, the list is presented as a table.
-3. On mobile, each seller is presented as a card.
-4. The list is paginated.
-5. Each row/card has a checkbox at the beginning (bulk action behaviour to be defined in a separate user story).
-6. Clicking a row/card navigates the admin to the seller detail screen.
-7. If no sellers exist, the screen displays "No sellers found".
+1. The screen displays a form with the following fields: `username` (required), `password` (required), `full_name` (optional), `phone` (optional), `address` (optional), `email` (optional).
+2. If `username` or `password` is left empty, the form shows a validation error on the respective field and prevents submission.
+3. If `password` is fewer than 6 characters, the form shows a validation error on the `password` field and prevents submission.
+4. If the submitted `username` already exists in the system, the form shows an error message: "Username already exists."
+5. If the account is created successfully, a toast message "Seller account created successfully" is shown and the admin is redirected to the seller accounts management screen.
 
 ## UI/UX References
 
 - None
+
+## Notes
+
+- Communicating the credentials (username and password) to the seller is the admin's responsibility and is out of scope for this user story.
 
 ---
 
@@ -41,23 +43,21 @@ The seller account list gives the admin an overview of all active sellers and se
 ```json
 {
   "id": "US-003",
-  "title": "Admin views seller account list",
+  "title": "Admin creates seller account",
   "priority": "Must",
   "actor": "admin",
   "as_a": "admin",
-  "i_want": "view a list of all created seller accounts",
-  "so_that": "I can monitor and manage sellers in the system",
-  "business_value": "The seller account list gives the admin an overview of all active sellers and serves as the entry point for further management tasks.",
+  "i_want": "create a seller account by providing username, password, and optional profile information",
+  "so_that": "the seller can log in and start managing their rental properties on the system",
+  "business_value": "Seller account is a prerequisite for any seller to use the system. Without this feature, the entire rental management flow is blocked.",
   "preconditions": ["Admin is logged in"],
-  "trigger": "Admin selects 'Sellers' from the side menu",
+  "trigger": "Admin taps 'Create Seller' on the seller accounts management screen",
   "acceptance_criteria": [
-    "List displays each seller: full_name, phone, address, created_at.",
-    "Desktop: table layout.",
-    "Mobile: card layout.",
-    "List is paginated.",
-    "Each row/card has a checkbox (bulk action to be defined in a separate US).",
-    "Clicking a row/card navigates to the seller detail screen.",
-    "No sellers: display 'No sellers found'."
+    "Form displays: username (required), password (required), full_name (optional), phone (optional), address (optional), email (optional).",
+    "Empty username or password shows field-level validation error and blocks submission.",
+    "Password shorter than 6 characters shows validation error on the password field and blocks submission.",
+    "Duplicate username shows error: 'Username already exists.'",
+    "On success: toast 'Seller account created successfully' and redirect to seller accounts management screen."
   ],
   "entities_involved": ["admin", "seller"],
   "ui_references": []
