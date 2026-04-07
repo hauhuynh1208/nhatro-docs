@@ -19,19 +19,21 @@ Có 3 đối tượng sử dụng app này: `admin`, `seller`, `buyer` (xem `app
 
 ## seller
 
-- Tạo `formula` với biểu thức có `{{variable}}`
+- Tạo `variable` (biến tham chiếu cho formula)
+- Tạo `formula` với biểu thức có `{{variable}}`, hỗ trợ điều kiện (if/else) và tham chiếu formula khác
 - Tạo tài khoản `buyer` với chỉ số `baseline` (điện, nước, số người) và tháng khởi điểm
-- Gán `formula` cho `buyer`
-- Tạo `container` để thu thập chỉ số cuối kỳ
-- Gửi link container đến buyer
-- Duyệt (approve/discard) các `submission` từ buyer
-- Xuất bill cho buyer
+- Gán `formula` riêng cho `buyer` (tuỳ chọn, override formula từ sheet config)
+- Tạo `usage record` (bảng ghi) để thu thập chỉ số cuối kỳ
+- Gửi link usage record đến buyer
+- Duyệt (approve/manual) các `submission` từ buyer
+- Tạo `sheet config`: chọn usage record cũ/mới, gắn variable và formula
+- Tạo `bill` từ sheet config
 - Kiểm tra tình trạng thanh toán
 
 ## buyer
 
-- Nhận link `container` từ seller
-- Submit chỉ số điện/nước vào container
+- Nhận link `usage record` từ seller
+- Submit chỉ số điện/nước vào usage record
 - Nhận và xem bill
 - Đóng tiền
 

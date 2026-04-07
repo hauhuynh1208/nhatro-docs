@@ -5,23 +5,27 @@
 ## Thiết lập ban đầu
 
 - admin mở tài khoản cho seller
-- seller tạo `formula` với biểu thức có chứa `{{variable}}`, ví dụ: `{{Số điện đã sử dụng}} * 2500 + {{Số nước đã sử dụng}} * 14000`
+- seller tạo các `variable` cần dùng (ví dụ: "Số điện đã sử dụng", "Số nước đã sử dụng", "Số người")
+- seller tạo `formula` với biểu thức có thể chứa `{{variable}}`, tham chiếu `formula` khác, số cụ thể, và điều kiện (if/else); ví dụ: `{{Số điện đã sử dụng}} * 2500 + {{Số nước đã sử dụng}} * 14000`
 - seller tạo tài khoản `buyer`, đặt tên tuỳ ý (ví dụ "Phòng A"), và nhập chỉ số `baseline` (điện, nước, số người) kèm tháng khởi điểm
-- seller gán 1 `formula` cho mỗi `buyer`
+- seller có thể gán `formula` riêng cho từng `buyer` để override formula từ `sheet config` (tuỳ chọn)
 
 ## Kỳ xuất bill
 
-1. Seller tạo 1 `container` cho billing cycle (ví dụ tháng 4/2026)
-2. Seller gửi link container đến các `buyer`
+1. Seller tạo 1 `usage record` (bảng ghi) và đặt tên (ví dụ "Tháng 4/2026")
+2. Seller gửi link usage record đến các `buyer`
 3. Mỗi buyer truy cập link và submit chỉ số điện/nước hiện tại (`submission`)
-4. Seller vào container, duyệt từng `submission`:
-   - `approve`: chấp nhận chỉ số — trở thành giá trị current
-   - `discard`: từ chối — không dùng để tính bill
-5. Với từng buyer đã được approve, hệ thống tính consumption:
-   - `{{Số điện đã sử dụng}}` = `electricity_current` − `electricity_baseline`
-   - `{{Số nước đã sử dụng}}` = `water_current` − `water_baseline`
-   - Áp các giá trị này vào `formula` của buyer để ra `total_amount`
-6. Seller xuất bill cho từng buyer. Bill có thể được copy dưới dạng hình ảnh để gửi cho buyer.
-7. Sau khi xuất bill, giá trị current đã được approve tự động trở thành `baseline` mới của buyer cho kỳ kế tiếp.
+4. Seller vào usage record, duyệt từng `submission`:
+   - `approve`: chấp nhận chỉ số do buyer gửi
+   - Seller có thể tự nhập thủ công nếu buyer không submit
+5. Sau khi duyệt, usage record lưu danh sách chỉ số điện/nước đã xác nhận của tất cả buyer
+6. Seller tạo `sheet config`:
+   - Chọn `usage record` cũ (old) và mới (new)
+   - Gắn `variable` vào giá trị điện/nước đã sử dụng (tính từ chênh lệch old và new record)
+   - Gắn `formula` mặc định cho sheet config (tuỳ chọn)
+7. Seller tạo `bill` bằng cách chọn `sheet config`:
+   - Hệ thống tính consumption cho từng buyer: giá trị new record − old record
+   - Áp variable bindings và formula (formula riêng của buyer nếu có, ngược lại dùng formula từ sheet config) để ra `total_amount`
+   - Xuất bill cho từng buyer; bill có thể được copy dưới dạng hình ảnh để gửi cho buyer
 
 Mỗi `buyer` chỉ có tối đa 1 `bill` cho mỗi `billing cycle`.

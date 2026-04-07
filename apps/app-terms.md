@@ -2,25 +2,27 @@ THUẬT NGỮ: GIẢI THÍCH
 
 admin: Người quản trị hệ thống, có quyền cao nhất để quản lý toàn bộ hệ thống và các `seller`.
 
-seller: Chủ nhà trọ — người tạo và quản lý `buyer`, `formula`, và `container` trong hệ thống.
+seller: Chủ nhà trọ — người tạo và quản lý `buyer`, `variable`, `formula`, `usage record`, và `sheet config` trong hệ thống.
 
-buyer: Người thuê trọ (tenant) — đơn vị tính bill do `seller` tạo. Mỗi buyer có chỉ số `baseline` (điện, nước, số người) và được gán 1 `formula`. Buyer nhận link `container` để submit chỉ số, và nhận `bill` sau khi seller duyệt. Seller có thể đặt tên buyer tuỳ ý (ví dụ "Phòng A").
+buyer: Người thuê trọ (tenant) — đơn vị tính bill do `seller` tạo. Mỗi buyer có chỉ số `baseline` (điện, nước, số người) và có thể được gán 1 `formula` riêng (override). Buyer nhận link `usage record` để submit chỉ số, và nhận `bill` sau khi seller duyệt. Seller có thể đặt tên buyer tuỳ ý (ví dụ "Phòng A").
 
-formula: Biểu thức do `seller` viết để tính `bill`. Có thể chứa `{{variable}}` (ví dụ: `{{Số điện đã sử dụng}} * 2500 + {{Số nước đã sử dụng}} * 14000`). Mỗi buyer được gán 1 formula duy nhất.
+formula: Biểu thức do `seller` viết để tính `bill`. Có thể chứa `{{variable}}`, tham chiếu đến `formula` khác, số cụ thể, và điều kiện (if/else). Ví dụ: `if {{Số người}} > 2 then {{Số điện đã sử dụng}} * 3000 else {{Số điện đã sử dụng}} * 2500`. Buyer có thể được gán formula riêng để override formula từ `sheet config`.
 
-variable: Giá trị tham chiếu trong biểu thức `formula`, viết dưới dạng `{{tên biến}}` (ví dụ: `{{Số điện đã sử dụng}}`). Được giải quyết tại thời điểm xuất bill: giá trị = current − baseline.
+variable: Biến có tên do `seller` định nghĩa (ví dụ: "Số điện đã sử dụng", "Tiền điện"). Được tham chiếu trong `formula` bằng cú pháp `{{tên biến}}`. Giá trị thực tế của variable được gắn vào qua `sheet config` tại thời điểm tạo bill.
 
-container: Phiên thu thập chỉ số do `seller` tạo cho 1 `billing cycle`. Seller gửi link container đến các buyer để họ submit chỉ số. Sau khi seller duyệt và xuất bill, container đóng lại.
+usage record: Bảng ghi chỉ số do `seller` tạo, dùng để thu thập chỉ số điện/nước từ các `buyer`. Seller đặt tên cho bảng ghi (ví dụ "Tháng 4/2026"), rồi gửi link cho buyer để submit. Sau khi seller duyệt xong, bảng ghi lưu danh sách chỉ số điện/nước đã xác nhận của tất cả buyer.
 
-submission: Bản ghi chỉ số (điện, nước) do `buyer` gửi vào `container` trong 1 billing cycle. Mỗi buyer có tối đa 1 submission per container. Sau khi `approve`, giá trị trở thành current value và sẽ replace `baseline` cho kỳ kế tiếp.
+submission: Bản ghi chỉ số (điện, nước) do `buyer` gửi vào `usage record`. Mỗi buyer có tối đa 1 submission per usage record. Sau khi `approve` (hoặc seller tự nhập thủ công), giá trị trở thành chỉ số hiện tại của buyer trong bảng ghi đó.
 
-baseline: Chỉ số khởi điểm (điện, nước, số người) của `buyer` tại một tháng cụ thể. Được khởi tạo khi seller tạo buyer, và tự động cập nhật thành current value sau mỗi billing cycle.
+baseline: Chỉ số khởi điểm (điện, nước, số người) của `buyer`, được nhập khi seller tạo buyer lần đầu. Baseline là điểm xuất phát ban đầu và không tự động cập nhật sau mỗi kỳ — consumption về sau được tính từ 2 `usage record` (old và new) thông qua `sheet config`.
 
-approve: Hành động của `seller` khi chấp nhận một `submission`. Giá trị được approve trở thành current value và được dùng để tính bill (consumption = current − baseline).
+sheet config: Thiết lập bảng tính do `seller` tạo để cấu hình tính bill. Seller chọn `usage record` cũ và mới, từ đó gắn `variable` vào giá trị điện/nước đã sử dụng (tính từ chênh lệch old và new record). Seller cũng có thể gắn `formula` mặc định. Một sheet config gắn với 1 cặp usage record cụ thể và được dùng để tạo `bill`.
+
+approve: Hành động của `seller` khi chấp nhận một `submission`, xác nhận giá trị điện/nước do buyer gửi. Nếu buyer không submit, seller có thể tự nhập thủ công.
 
 discard: Hành động của `seller` khi từ chối một `submission` (không dùng để tính bill).
 
-bill: Hóa đơn của một `buyer` cho một `billing cycle` (tháng). Mỗi `buyer` chỉ có tối đa một `bill` cho mỗi kỳ.
+bill: Hóa đơn của một `buyer` cho một kỳ tính tiền, được tạo từ 1 `sheet config`. Hệ thống tính consumption (chênh lệch giữa old và new usage record), áp variable bindings và formula để ra tổng tiền. Mỗi `buyer` chỉ có tối đa một `bill` cho mỗi kỳ.
 
 billing cycle: Kỳ tính tiền (ví dụ: tháng dương lịch) dùng để gom `submission` và xuất `bill`.
 
