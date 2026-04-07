@@ -4,7 +4,7 @@ admin: Người quản trị hệ thống, có quyền cao nhất để quản l
 
 seller: Chủ nhà trọ — người tạo và quản lý `buyer`, `variable`, `formula`, `usage record`, và `sheet config` trong hệ thống.
 
-buyer: Người thuê trọ (tenant) — đơn vị tính bill do `seller` tạo. Mỗi buyer có chỉ số `baseline` (điện, nước, số người) và có thể được gán 1 `formula` riêng (override). Buyer nhận link `usage record` để submit chỉ số, và nhận `bill` sau khi seller duyệt. Seller có thể đặt tên buyer tuỳ ý (ví dụ "Phòng A").
+buyer: Người thuê trọ (tenant) — đơn vị tính bill do `seller` tạo. Mỗi buyer có chỉ số `baseline` (điện, nước, số người), `room_price` (tiền phòng), và có thể được gán 1 `formula` riêng (override). Các giá trị `people_count` và `room_price` có thể thay đổi theo thời gian nhưng không ảnh hưởng đến các `bill` đã tạo (giá trị được snapshot tại thời điểm phát hành bill). Buyer nhận link `usage record` để submit chỉ số, và nhận `bill` sau khi seller duyệt. Seller có thể đặt tên buyer tuỳ ý (ví dụ "Phòng A").
 
 formula: Biểu thức do `seller` viết để tính `bill`. Có thể chứa `{{variable}}`, tham chiếu đến `formula` khác, số cụ thể, và điều kiện (if/else). Ví dụ: `if {{Số người}} > 2 then {{Số điện đã sử dụng}} * 3000 else {{Số điện đã sử dụng}} * 2500`. Buyer có thể được gán formula riêng để override formula từ `sheet config`.
 
@@ -22,7 +22,7 @@ approve: Hành động của `seller` khi chấp nhận một `submission`, xác
 
 discard: Hành động của `seller` khi từ chối một `submission` (không dùng để tính bill).
 
-bill: Hóa đơn của một `buyer` cho một kỳ tính tiền, được tạo từ 1 `sheet config`. Hệ thống tính consumption (chênh lệch giữa old và new usage record), áp variable bindings và formula để ra tổng tiền. Mỗi `buyer` chỉ có tối đa một `bill` cho mỗi kỳ.
+bill: Hóa đơn của một `buyer` cho một kỳ tính tiền, được tạo từ 1 `sheet config`. Hệ thống tính consumption (chênh lệch giữa old và new usage record), áp variable bindings và formula để ra tổng tiền. Giá trị `people_count` và `room_price` của buyer được snapshot vào `line_items` tại thời điểm tạo bill — thay đổi sau này của buyer không ảnh hưởng đến bill đã phát hành. Mỗi `buyer` chỉ có tối đa một `bill` cho mỗi kỳ.
 
 billing cycle: Kỳ tính tiền (ví dụ: tháng dương lịch) dùng để gom `submission` và xuất `bill`.
 

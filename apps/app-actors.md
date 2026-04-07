@@ -14,13 +14,14 @@ seller:
 
 buyer:
 
-- Trường: id, username, email (tuỳ), full_name, phone, formula_id (FK → formula, tuỳ — override formula từ sheet config), electricity_baseline, water_baseline, people_count, baseline_month (YYYY-MM), created_at
+- Trường: id, username, email (tuỳ), full_name, phone, formula_id (FK → formula, tuỳ — override formula từ sheet config), electricity_baseline, water_baseline, people_count, room_price, baseline_month (YYYY-MM), created_at
+- Lưu ý: `people_count` và `room_price` có thể thay đổi theo thời gian; giá trị tại thời điểm tạo bill phải được snapshot vào `bill.line_items` để đảm bảo tính bất biến lịch sử
 - Mối quan hệ: 1 buyer thuộc 1 seller; 1 buyer có thể được gán 1 formula (override, tuỳ); 1 buyer gửi N submission; 1 buyer có N bill (tối đa 1 bill mỗi billing_cycle)
 - Ghi chú: buyer đại diện cho 1 đơn vị tính bill (ví dụ 1 phòng, 1 hộ). Seller có thể đặt tên buyer tuỳ ý (ví dụ "Phòng A", "Nhà chị Lan").
 
 formula:
 
-- Trường: id, seller_id (FK → seller), name, expression (biểu thức có thể chứa {{variable}}, tham chiếu formula khác, số cụ thể, và điều kiện if/else; ví dụ: {{Số điện đã sử dụng}} _ 2500 + {{Số nước đã sử dụng}} _ 14000), formula_refs[] (danh sách formula được tham chiếu), created_at, updated_at
+- Trường: id, seller*id (FK → seller), name, expression (biểu thức có thể chứa {{variable}}, tham chiếu formula khác, số cụ thể, và điều kiện if/else; ví dụ: {{Số điện đã sử dụng}} * 2500 + {{Số nước đã sử dụng}} \_ 14000), formula_refs[] (danh sách formula được tham chiếu), created_at, updated_at
 - Mối quan hệ: 1 seller có N formula; 1 formula được gán cho N buyer (override); 1 formula được dùng trong N sheet config
 
 variable:
@@ -40,12 +41,13 @@ submission:
 
 sheet_config:
 
-- Trường: id, seller_id (FK → seller), name, old_record_id (FK → usage_record), new_record_id (FK → usage_record), formula_id (FK → formula, tuỳ — formula mặc định áp cho buyer chưa có override), variable_bindings [{variable_id (FK → variable), binding_type (electricity_used|water_used|people_count)}], created_at
+- Trường: id, seller_id (FK → seller), name, old_record_id (FK → usage_record), new_record_id (FK → usage_record), formula_id (FK → formula, tuỳ — formula mặc định áp cho buyer chưa có override), variable_bindings [{variable_id (FK → variable), binding_type (electricity_used|water_used|people_count|room_price)}], created_at
 - Mối quan hệ: 1 seller tạo N sheet config; 1 sheet config gắn với 1 cặp usage record (old + new); 1 sheet config có thể gắn 1 formula mặc định; 1 sheet config được dùng để tạo N bill
 
 bill:
 
 - Trường: id, buyer_id (FK → buyer), sheet_config_id (FK → sheet_config), billing_cycle (YYYY-MM), issued_by (seller/admin), issued_at, line_items [{description, variable, value, amount}], total_amount, status (draft/issued/paid/void), export_url (PDF/PNG), metadata
+- Lưu ý: `line_items` snapshot giá trị `people_count` và `room_price` của buyer tại thời điểm tạo bill — không tham chiếu về sau để đảm bảo tính bất biến lịch sử
 - Ràng buộc: mỗi (buyer_id, billing_cycle) chỉ có tối đa 1 bill
 - Mối quan hệ: 1 bill thuộc 1 buyer; 1 bill được tạo từ 1 sheet config; 1 bill có N payment
 
