@@ -22,7 +22,7 @@ buyer:
 
 formula:
 
-- Trường: id, seller_id (FK → seller), name, expression (cây biểu thức — expression tree — lưu dạng JSON. Mỗi node có type: "number" | "variable" | "formula" | "if_else" | "operation". Ví dụ: operation(+, variable(Số điện đã sử dụng) _ 2500, if_else(condition: variable(Số người) > 2, then: variable(Số nước đã sử dụng) _ 14000, else: 12000))), formula_refs[] (danh sách formula_id được tham chiếu — dùng để kiểm tra circular reference), created_at, updated_at
+- Trường: id, seller*id (FK → seller), name, expression (cây biểu thức — expression tree — lưu dạng JSON. Mỗi node có type: "number" | "variable" | "formula" | "if_else" | "operation". Ví dụ: operation(+, variable(Số điện đã sử dụng) * 2500, if*else(condition: variable(Số người) > 2, then: variable(Số nước đã sử dụng) * 14000, else: 12000))), formula_refs[] (danh sách formula_id được tham chiếu — dùng để kiểm tra circular reference), created_at, updated_at
 - Ràng buộc: `name` phải unique trong cùng 1 seller; `formula_refs[]` không được tạo circular reference (formula không được tham chiếu trực tiếp hoặc gián tiếp đến chính nó).
 - Mối quan hệ: 1 seller có N formula; 1 formula được gán cho N buyer (override); 1 formula được dùng trong N sheet config
 
@@ -34,7 +34,8 @@ variable:
 
 usage_record:
 
-- Trường: id, seller_id (FK → seller), name, billing_cycle (YYYY-MM), link_token, status (open/closed), created_at
+- Trường: id, seller_id (FK → seller), name, link_token, status (open/closed), created_at
+- Ràng buộc: `name` phải unique trong cùng 1 seller.
 - Mối quan hệ: 1 seller tạo N usage record; 1 usage record nhận N submission từ các buyer; 1 usage record được dùng làm old_record hoặc new_record trong N sheet config
 
 submission:

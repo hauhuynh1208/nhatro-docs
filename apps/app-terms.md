@@ -10,7 +10,7 @@ formula: Biểu thức do `seller` viết để tính `bill`. Có thể chứa `
 
 variable: Biến có tên do `seller` định nghĩa (ví dụ: "Số điện đã sử dụng", "Tiền điện"). Được tham chiếu trong `formula` bằng cú pháp `{{tên biến}}`. Giá trị thực tế của variable được gắn vào qua `sheet config` tại thời điểm tạo bill.
 
-usage record: Bảng ghi chỉ số do `seller` tạo, dùng để thu thập chỉ số điện/nước từ các `buyer`. Seller đặt tên cho bảng ghi (ví dụ "Tháng 4/2026"), rồi gửi link cho buyer để submit. Sau khi seller duyệt xong, bảng ghi lưu danh sách chỉ số điện/nước đã xác nhận của tất cả buyer.
+usage record: Bảng ghi chỉ số do `seller` tạo, dùng để thu thập chỉ số điện/nước từ các `buyer`. Seller đặt tên cho bảng ghi, rồi gửi link cho buyer để submit. Sau khi seller duyệt xong, bảng ghi lưu danh sách chỉ số điện/nước đã xác nhận của tất cả buyer. Tên usage record phải unique trong cùng 1 seller.
 
 submission: Bản ghi chỉ số (điện, nước) do `buyer` gửi vào `usage record`. Mỗi buyer có tối đa 1 submission per usage record. Sau khi `approve` (hoặc seller tự nhập thủ công), giá trị trở thành chỉ số hiện tại của buyer trong bảng ghi đó.
 
