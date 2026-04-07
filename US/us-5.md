@@ -25,8 +25,9 @@ Creating a buyer is the foundational step for billing. Without a buyer record, t
 1. The creation form includes the following fields: name (required), number of occupants — `people_count` (required, positive integer), room price — `room_price` (required, positive number), electricity baseline (required, non-negative number), water baseline (required, non-negative number), baseline month (required, YYYY-MM format).
 2. Submitting the form with any required field empty shows a validation error on that field.
 3. Submitting with a non-positive value for `people_count` or `room_price` shows a validation error.
-4. On successful submission, the new buyer appears in the buyer list.
-5. If seller later updates `room_price` or `people_count` for the buyer, previously issued bills for that buyer remain unchanged.
+4. Submitting with a name already used by another buyer of this seller shows a validation error.
+5. On successful submission, the new buyer appears in the buyer list.
+6. If seller later updates `room_price` or `people_count` for the buyer, previously issued bills for that buyer remain unchanged.
 
 ## UI/UX References
 
@@ -52,6 +53,7 @@ Creating a buyer is the foundational step for billing. Without a buyer record, t
     "Form includes: name (required), people_count (required, positive integer), room_price (required, positive number), electricity_baseline (required, non-negative), water_baseline (required, non-negative), baseline_month (required, YYYY-MM).",
     "Submitting with any required field empty shows a validation error on that field.",
     "Submitting with a non-positive value for people_count or room_price shows a validation error.",
+    "Submitting with a name already used by another buyer of this seller shows a validation error.",
     "On success, the new buyer appears in the buyer list.",
     "If seller later updates room_price or people_count, previously issued bills remain unchanged."
   ],

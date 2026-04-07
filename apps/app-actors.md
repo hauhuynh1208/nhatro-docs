@@ -18,6 +18,7 @@ buyer:
 - Lưu ý: `people_count` và `room_price` có thể thay đổi theo thời gian; giá trị tại thời điểm tạo bill phải được snapshot vào `bill.line_items` để đảm bảo tính bất biến lịch sử
 - Mối quan hệ: 1 buyer thuộc 1 seller; 1 buyer có thể được gán 1 formula (override, tuỳ); 1 buyer gửi N submission; 1 buyer có N bill (tối đa 1 bill mỗi billing_cycle)
 - Ghi chú: buyer đại diện cho 1 đơn vị tính bill (ví dụ 1 phòng, 1 hộ). Seller có thể đặt tên buyer tuỳ ý (ví dụ "Phòng A", "Nhà chị Lan").
+- Ràng buộc: `full_name` phải unique trong cùng 1 seller (không cho phép 2 buyer cùng tên thuộc 1 seller).
 
 formula:
 
@@ -27,6 +28,7 @@ formula:
 variable:
 
 - Trường: id, seller_id (FK → seller), name, description (tuỳ), created_at
+- Ràng buộc: `name` phải unique trong cùng 1 seller (không cho phép 2 variable cùng tên thuộc 1 seller).
 - Mối quan hệ: 1 seller có N variable; 1 variable được tham chiếu trong N formula; 1 variable được gắn trong N sheet config (qua variable_bindings)
 
 usage_record:
