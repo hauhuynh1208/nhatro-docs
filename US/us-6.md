@@ -28,7 +28,7 @@ Variables are the building blocks of formulas. Having a clear overview of all va
 4. On mobile, each variable is presented as a card.
 5. The list is paginated.
 6. Each row/card has a checkbox (bulk action behaviour to be defined in a separate user story).
-7. Clicking a row/card navigates the seller to the variable detail screen.
+7. The variable's `name` in each row/card is a link. Clicking it navigates the seller to the variable detail screen.
 8. If no variables exist, the screen displays "No variables found".
 
 ## UI/UX References
@@ -58,7 +58,7 @@ Variables are the building blocks of formulas. Having a clear overview of all va
     "Mobile: card layout.",
     "List is paginated.",
     "Each row/card has a checkbox (bulk action to be defined in a separate US).",
-    "Clicking a row/card navigates to the variable detail screen.",
+    "The variable's name in each row/card is a link. Clicking it navigates to the variable detail screen.",
     "No variables: display 'No variables found'."
   ],
   "entities_involved": ["seller", "variable", "formula"],

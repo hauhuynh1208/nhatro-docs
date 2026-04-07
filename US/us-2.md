@@ -27,7 +27,7 @@ The seller account list gives the admin an overview of all active sellers and se
 3. On mobile, each seller is presented as a card.
 4. The list is paginated.
 5. Each row/card has a checkbox at the beginning (bulk action behaviour to be defined in a separate user story).
-6. Clicking a row/card navigates the admin to the seller detail screen.
+6. The seller's `full_name` in each row/card is a link. Clicking it navigates the admin to the seller detail screen.
 7. If no sellers exist, the screen displays "No sellers found".
 
 ## UI/UX References
@@ -56,7 +56,7 @@ The seller account list gives the admin an overview of all active sellers and se
     "Mobile: card layout.",
     "List is paginated.",
     "Each row/card has a checkbox (bulk action to be defined in a separate US).",
-    "Clicking a row/card navigates to the seller detail screen.",
+    "The seller's full_name in each row/card is a link. Clicking it navigates to the seller detail screen.",
     "No sellers: display 'No sellers found'."
   ],
   "entities_involved": ["admin", "seller"],

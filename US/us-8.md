@@ -27,7 +27,7 @@ Formulas define how bills are calculated for each buyer. A clear formula list gi
 3. On mobile, each formula is presented as a card.
 4. The list is paginated.
 5. Each row/card has a checkbox (bulk action behaviour to be defined in a separate user story).
-6. Clicking a row/card navigates the seller to the formula detail screen.
+6. The formula's `name` in each row/card is a link. Clicking it navigates the seller to the formula detail screen.
 7. If no formulas exist, the screen displays "No formulas found".
 
 ## UI/UX References
@@ -56,7 +56,7 @@ Formulas define how bills are calculated for each buyer. A clear formula list gi
     "Mobile: card layout.",
     "List is paginated.",
     "Each row/card has a checkbox (bulk action to be defined in a separate US).",
-    "Clicking a row/card navigates to the formula detail screen.",
+    "The formula's name in each row/card is a link. Clicking it navigates to the formula detail screen.",
     "No formulas: display 'No formulas found'."
   ],
   "entities_involved": ["seller", "formula"],

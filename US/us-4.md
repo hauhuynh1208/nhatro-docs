@@ -27,7 +27,7 @@ The buyer list is the seller's central view for managing all billing units. With
 3. On mobile, each buyer is presented as a card.
 4. The list is paginated.
 5. Each row/card has a checkbox (bulk action behaviour to be defined in a separate user story).
-6. Clicking a row/card navigates the seller to the buyer detail screen.
+6. The buyer's name in each row/card is a link. Clicking it navigates the seller to the buyer detail screen.
 7. If no buyers exist, the screen displays "No buyers found".
 
 ## UI/UX References
@@ -56,7 +56,7 @@ The buyer list is the seller's central view for managing all billing units. With
     "Mobile: card layout.",
     "List is paginated.",
     "Each row/card has a checkbox (bulk action to be defined in a separate US).",
-    "Clicking a row/card navigates to the buyer detail screen.",
+    "The buyer's name in each row/card is a link. Clicking it navigates to the buyer detail screen.",
     "No buyers: display 'No buyers found'."
   ],
   "entities_involved": ["seller", "buyer"],
