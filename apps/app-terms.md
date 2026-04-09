@@ -24,7 +24,7 @@ approve: Hành động của `seller` khi chấp nhận một `submission`, xác
 
 discard: Hành động của `seller` khi từ chối một `submission` (không dùng để tính bill).
 
-bill: Hóa đơn của một `buyer` cho một kỳ tính tiền, được tạo từ 1 `sheet config`. Hệ thống tính consumption (chênh lệch giữa old và new usage record), áp variable bindings và formula để ra tổng tiền. Giá trị `people_count` và `room_price` của buyer được snapshot vào `line_items` tại thời điểm tạo bill — thay đổi sau này của buyer không ảnh hưởng đến bill đã phát hành. Mỗi `buyer` chỉ có tối đa một `bill` cho mỗi kỳ.
+bill: Hóa đơn của một `buyer` cho một kỳ tính tiền, được tạo từ 1 `sheet config`. Seller đặt tên cho bill (tên phải unique trong cùng 1 seller). Hệ thống tính consumption (chênh lệch giữa old và new usage record), áp variable bindings và formula để ra tổng tiền. Giá trị `people_count` và `room_price` của buyer được snapshot vào `line_items` tại thời điểm tạo bill — thay đổi sau này của buyer không ảnh hưởng đến bill đã phát hành. Mỗi `buyer` chỉ có tối đa một `bill` cho mỗi kỳ.
 
 billing cycle: Kỳ tính tiền (ví dụ: tháng dương lịch) dùng để gom `submission` và xuất `bill`.
 

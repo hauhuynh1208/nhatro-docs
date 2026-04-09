@@ -55,9 +55,9 @@ replacement_request:
 
 bill:
 
-- Trường: id, buyer_id (FK → buyer), sheet_config_id (FK → sheet_config), billing_cycle (YYYY-MM), issued_by (seller/admin), issued_at, line_items [{description, variable, value, amount}], total_amount, status (draft/issued/paid/void), export_url (PDF/PNG), metadata
+- Trường: id, seller_id (FK → seller), buyer_id (FK → buyer), sheet_config_id (FK → sheet_config), name (tên bill do seller đặt), billing_cycle (YYYY-MM), issued_by (seller/admin), issued_at, line_items [{description, variable, value, amount}], total_amount, status (draft/issued/paid/void), export_url (PDF/PNG), metadata
 - Lưu ý: `line_items` snapshot giá trị `people_count` và `room_price` của buyer tại thời điểm tạo bill — không tham chiếu về sau để đảm bảo tính bất biến lịch sử
-- Ràng buộc: mỗi (buyer_id, billing_cycle) chỉ có tối đa 1 bill
+- Ràng buộc: mỗi (buyer_id, billing_cycle) chỉ có tối đa 1 bill; `name` phải unique trong cùng 1 seller
 - Mối quan hệ: 1 bill thuộc 1 buyer; 1 bill được tạo từ 1 sheet config; 1 bill có N payment
 
 payment:
