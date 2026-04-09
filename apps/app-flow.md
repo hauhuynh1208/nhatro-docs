@@ -10,6 +10,16 @@
 - seller tạo tài khoản `buyer`, đặt tên tuỳ ý (ví dụ "Phòng A"), và nhập chỉ số `baseline` (điện, nước, số người) kèm tháng khởi điểm
 - seller có thể gán `formula` riêng cho từng `buyer` để override formula từ `sheet config` (tuỳ chọn)
 
+## Thay đồng hồ (khi cần)
+
+Khi đồng hồ điện hoặc nước của 1 buyer bị thay mới, seller tạo 1 `replacement request` cho buyer đó:
+
+- Chọn loại đồng hồ (điện hoặc nước)
+- Nhập chỉ số đồng hồ vật lý cũ tại thời điểm thay (x)
+- Nhập chỉ số ban đầu của đồng hồ mới sau khi lắp (a)
+
+Khi tính bill cho kỳ có thay đồng hồ, seller áp replacement request vào sheet config. Lúc này lượng tiêu thụ được tính theo công thức `(b − a) + (x − y)`, trong đó y là chỉ số từ old usage record và b là chỉ số từ new usage record.
+
 ## Kỳ xuất bill
 
 1. Seller tạo 1 `usage record` (bảng ghi) và đặt tên (ví dụ "Tháng 4/2026")

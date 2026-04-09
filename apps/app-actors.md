@@ -10,13 +10,13 @@ Note: `admin` accounts are provisioned by developer — developer manually creat
 seller:
 
 - Trường: id, username, email (tuỳ), full_name, phone, address (tuỳ), created_at
-- Mối quan hệ: 1 seller tạo N buyer; 1 seller tạo N variable; 1 seller tạo N formula; 1 seller tạo N usage record; 1 seller tạo N sheet config
+- Mối quan hệ: 1 seller tạo N buyer; 1 seller tạo N variable; 1 seller tạo N formula; 1 seller tạo N usage record; 1 seller tạo N sheet config; 1 seller tạo N replacement request
 
 buyer:
 
 - Trường: id, username, email (tuỳ), full_name, phone, formula_id (FK → formula, tuỳ — override formula từ sheet config), electricity_baseline, water_baseline, people_count, room_price, baseline_month (YYYY-MM), created_at
 - Lưu ý: `people_count` và `room_price` có thể thay đổi theo thời gian; giá trị tại thời điểm tạo bill phải được snapshot vào `bill.line_items` để đảm bảo tính bất biến lịch sử
-- Mối quan hệ: 1 buyer thuộc 1 seller; 1 buyer có thể được gán 1 formula (override, tuỳ); 1 buyer gửi N submission; 1 buyer có N bill (tối đa 1 bill mỗi billing_cycle)
+- Mối quan hệ: 1 buyer thuộc 1 seller; 1 buyer có thể được gán 1 formula (override, tuỳ); 1 buyer gửi N submission; 1 buyer có N bill (tối đa 1 bill mỗi billing_cycle); 1 buyer có N replacement request
 - Ghi chú: buyer đại diện cho 1 đơn vị tính bill (ví dụ 1 phòng, 1 hộ). Seller có thể đặt tên buyer tuỳ ý (ví dụ "Phòng A", "Nhà chị Lan").
 - Ràng buộc: `full_name` phải unique trong cùng 1 seller (không cho phép 2 buyer cùng tên thuộc 1 seller).
 
@@ -48,6 +48,11 @@ sheet_config:
 - Trường: id, seller_id (FK → seller), name, old_record_id (FK → usage_record), new_record_id (FK → usage_record), formula_id (FK → formula, tuỳ — formula mặc định áp cho buyer chưa có override), variable_bindings [{variable_id (FK → variable), binding_type (electricity_used|water_used|people_count|room_price)}], created_at
 - Mối quan hệ: 1 seller tạo N sheet config; 1 sheet config gắn với 1 cặp usage record (old + new); 1 sheet config có thể gắn 1 formula mặc định; 1 sheet config được dùng để tạo N bill
 
+replacement_request:
+
+- Trường: id, seller_id (FK → seller), buyer_id (FK → buyer), type (electricity | water), old_reading (chỉ số đồng hồ vật lý cũ tại thời điểm thay — x), new_reading (chỉ số ban đầu của đồng hồ mới — a), created_at
+- Mối quan hệ: 1 replacement request thuộc 1 seller và 1 buyer; 1 buyer có thể có N replacement request (nhiều lần thay đồng hồ)
+
 bill:
 
 - Trường: id, buyer_id (FK → buyer), sheet_config_id (FK → sheet_config), billing_cycle (YYYY-MM), issued_by (seller/admin), issued_at, line_items [{description, variable, value, amount}], total_amount, status (draft/issued/paid/void), export_url (PDF/PNG), metadata
@@ -77,6 +82,8 @@ Ghi chú về cardinality & hành vi:
 - buyer(1) — formula(0..1) (override tuỳ chọn)
 - buyer(1) — submission(N) (tối đa 1 submission per usage record)
 - buyer(1) — bill(N) (unique per billing_cycle)
+- buyer(1) — replacement_request(N)
+- seller(1) — replacement_request(N)
 - sheet_config(1) — usage_record_old(1) + usage_record_new(1)
 - sheet_config(1) — bill(N)
 

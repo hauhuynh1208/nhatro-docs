@@ -18,6 +18,8 @@ baseline: Chỉ số khởi điểm (điện, nước, số người) của `buy
 
 sheet config: Thiết lập bảng tính do `seller` tạo để cấu hình tính bill. Seller chọn `usage record` cũ và mới, từ đó gắn `variable` vào giá trị điện/nước đã sử dụng (tính từ chênh lệch old và new record). Seller cũng có thể gắn `formula` mặc định. Một sheet config gắn với 1 cặp usage record cụ thể và được dùng để tạo `bill`.
 
+replacement request: Bản ghi sự kiện thay đồng hồ điện hoặc nước của 1 `buyer`, do `seller` tạo. Lưu loại đồng hồ (điện/nước), chỉ số đồng hồ vật lý cũ tại thời điểm thay (x), và chỉ số ban đầu của đồng hồ mới sau khi lắp (a). Khi có replacement request, lượng tiêu thụ trong kỳ tính bill được tính theo công thức `(b − a) + (x − y)`, trong đó b là chỉ số đồng hồ mới từ new usage record, y là chỉ số đồng hồ cũ từ old usage record. Điều này đảm bảo tổng tiêu thụ gồm cả phần dùng trên đồng hồ cũ (chưa được ghi nhận) và phần dùng trên đồng hồ mới.
+
 approve: Hành động của `seller` khi chấp nhận một `submission`, xác nhận giá trị điện/nước do buyer gửi. Nếu buyer không submit, seller có thể tự nhập thủ công.
 
 discard: Hành động của `seller` khi từ chối một `submission` (không dùng để tính bill).
