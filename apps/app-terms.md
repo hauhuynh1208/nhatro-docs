@@ -4,7 +4,7 @@ admin: Người quản trị hệ thống, có quyền cao nhất để quản l
 
 seller: Chủ nhà trọ — người tạo và quản lý `buyer`, `variable`, `formula`, `usage record`, và `sheet config` trong hệ thống.
 
-buyer: Người thuê trọ (tenant) — đơn vị tính bill do `seller` tạo. Mỗi buyer có chỉ số `baseline` (điện, nước, số người), `room_price` (tiền phòng), và có thể được gán 1 `formula` riêng (override). Các giá trị `people_count` và `room_price` có thể thay đổi theo thời gian nhưng không ảnh hưởng đến các `bill` đã tạo (giá trị được snapshot tại thời điểm phát hành bill). Buyer nhận link `usage record` để submit chỉ số, và nhận `bill` sau khi seller duyệt. Seller có thể đặt tên buyer tuỳ ý (ví dụ "Phòng A").
+buyer: Người thuê trọ (tenant) — đơn vị tính bill do `seller` tạo. Mỗi buyer có `people_count` (số người), `room_price` (tiền phòng), và có thể được gán 1 `formula` riêng (override). Các giá trị `people_count` và `room_price` có thể thay đổi theo thời gian nhưng không ảnh hưởng đến các `bill` đã tạo (giá trị được snapshot tại thời điểm phát hành bill). Buyer nhận link `usage record` để submit chỉ số, và nhận `bill` sau khi seller duyệt. Seller có thể đặt tên buyer tuỳ ý (ví dụ "Phòng A").
 
 formula: Biểu thức do `seller` viết để tính `bill`. Có thể chứa `{{variable}}`, tham chiếu đến `formula` khác, số cụ thể, và điều kiện (if/else). Ví dụ: `if {{Số người}} > 2 then {{Số điện đã sử dụng}} * 3000 else {{Số điện đã sử dụng}} * 2500`. Buyer có thể được gán formula riêng để override formula từ `sheet config`.
 
@@ -14,9 +14,9 @@ usage record: Bảng ghi chỉ số do `seller` tạo, dùng để thu thập ch
 
 submission: Bản ghi chỉ số (điện, nước) do `buyer` gửi vào `usage record`. Mỗi buyer có tối đa 1 submission per usage record. Sau khi `approve` (hoặc seller tự nhập thủ công), giá trị trở thành chỉ số hiện tại của buyer trong bảng ghi đó.
 
-baseline: Chỉ số khởi điểm (điện, nước, số người) của `buyer`, được nhập khi seller tạo buyer lần đầu. Baseline là điểm xuất phát ban đầu và không tự động cập nhật sau mỗi kỳ — consumption về sau được tính từ 2 `usage record` (old và new) thông qua `sheet config`.
+baseline: Chỉ số khởi điểm điện/nước của `buyer` dùng để tính consumption. Baseline được cung cấp bởi `usage record` cũ (old record) trong `sheet config` — không phải được lưu trữ trực tiếp trên entity buyer. Consumption được tính từ chênh lệch giữa old và new usage record.
 
-sheet config: Thiết lập bảng tính do `seller` tạo để cấu hình tính bill. Seller chọn `usage record` cũ và mới, từ đó gắn `variable` vào giá trị điện/nước đã sử dụng (tính từ chênh lệch old và new record). Seller cũng có thể gắn `formula` mặc định. Một sheet config gắn với 1 cặp usage record cụ thể và được dùng để tạo `bill`.
+sheet config: Biểu mẫu tính bill do `seller` tạo. Seller định nghĩa các cột (column): các cột có sẵn (people_count, room_price, chỉ số điện/nước cũ, mới, lượng điện/nước đã dùng) và các cột tự thêm. Mỗi cột có thể được gán 1 `variable` (biến nhận giá trị của cột đó) hoặc 1 `formula` (hiển thị kết quả tính của formula). Khi tạo sheet config, seller dùng dữ liệu dummy để preview kết quả — không có `usage record` nào được gắn vào lúc này. Khi tạo `bill`, seller chọn sheet config kèm old và new `usage record`; hệ thống thay thế các cột chỉ số bằng dữ liệu thực tế của từng `buyer`.
 
 replacement request: Bản ghi sự kiện thay đồng hồ điện hoặc nước của 1 `buyer`, do `seller` tạo. Lưu loại đồng hồ (điện/nước), chỉ số đồng hồ vật lý cũ tại thời điểm thay (x), và chỉ số ban đầu của đồng hồ mới sau khi lắp (a). Khi có replacement request, lượng tiêu thụ trong kỳ tính bill được tính theo công thức `(b − a) + (x − y)`, trong đó b là chỉ số đồng hồ mới từ new usage record, y là chỉ số đồng hồ cũ từ old usage record. Điều này đảm bảo tổng tiêu thụ gồm cả phần dùng trên đồng hồ cũ (chưa được ghi nhận) và phần dùng trên đồng hồ mới.
 

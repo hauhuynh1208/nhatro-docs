@@ -7,7 +7,7 @@
 - admin mở tài khoản cho seller
 - seller tạo các `variable` cần dùng (ví dụ: "Số điện đã sử dụng", "Số nước đã sử dụng", "Số người")
 - seller tạo `formula` với biểu thức có thể chứa `{{variable}}`, tham chiếu `formula` khác, số cụ thể, và điều kiện (if/else); ví dụ: `{{Số điện đã sử dụng}} * 2500 + {{Số nước đã sử dụng}} * 14000`
-- seller tạo tài khoản `buyer`, đặt tên tuỳ ý (ví dụ "Phòng A"), và nhập chỉ số `baseline` (điện, nước, số người) kèm tháng khởi điểm
+- seller tạo tài khoản `buyer`, đặt tên tuỳ ý (ví dụ "Phòng A"), nhập số người (`people_count`) và tiền phòng (`room_price`)
 - seller có thể gán `formula` riêng cho từng `buyer` để override formula từ `sheet config` (tuỳ chọn)
 
 ## Thay đồng hồ (khi cần)

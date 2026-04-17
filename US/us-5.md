@@ -5,7 +5,7 @@ ID: US-005
 Priority: Must
 Actor: seller
 As a: seller
-I want: create a new buyer with their name, room price, number of occupants, and initial utility readings
+I want: create a new buyer with their name, room price, and number of occupants
 So that: the buyer is registered in the system and ready to be billed in future billing cycles
 
 ## Business Value
@@ -22,7 +22,7 @@ Creating a buyer is the foundational step for billing. Without a buyer record, t
 
 ## Acceptance Criteria
 
-1. The creation form includes the following fields: name (required), number of occupants — `people_count` (required, positive integer), room price — `room_price` (required, positive number), electricity baseline (required, non-negative number), water baseline (required, non-negative number), baseline month (required, YYYY-MM format).
+1. The creation form includes the following fields: name (required), number of occupants — `people_count` (required, positive integer), room price — `room_price` (required, positive number).
 2. Submitting the form with any required field empty shows a validation error on that field.
 3. Submitting with a non-positive value for `people_count` or `room_price` shows a validation error.
 4. Submitting with a name already used by another buyer of this seller shows a validation error.
@@ -44,13 +44,13 @@ Creating a buyer is the foundational step for billing. Without a buyer record, t
   "priority": "Must",
   "actor": "seller",
   "as_a": "seller",
-  "i_want": "create a new buyer with their name, room price, number of occupants, and initial utility readings",
+  "i_want": "create a new buyer with their name, room price, and number of occupants",
   "so_that": "the buyer is registered in the system and ready to be billed in future billing cycles",
   "business_value": "Creating a buyer is the foundational step for billing. Without a buyer record, the seller cannot collect utility readings, issue bills, or track payments for that unit.",
   "preconditions": ["Seller is logged in"],
   "trigger": "Seller taps 'Add Buyer' on the buyer list screen",
   "acceptance_criteria": [
-    "Form includes: name (required), people_count (required, positive integer), room_price (required, positive number), electricity_baseline (required, non-negative), water_baseline (required, non-negative), baseline_month (required, YYYY-MM).",
+    "Form includes: name (required), people_count (required, positive integer), room_price (required, positive number).",
     "Submitting with any required field empty shows a validation error on that field.",
     "Submitting with a non-positive value for people_count or room_price shows a validation error.",
     "Submitting with a name already used by another buyer of this seller shows a validation error.",
